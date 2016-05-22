@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 include(CheckIncludeFiles)
 
 # Build options
-option(BUILD_SHARED_LIBS "Build shared library" OFF)
+# option(BUILD_SHARED_LIBS "Build shared library" OFF)
 if(APPLE)
     option(BUILD_FRAMEWORK "Build Framework bundle for OSX" OFF)
 endif()
@@ -104,11 +104,59 @@ endif()
 
 configure_pkg_config_file(ogg.pc.in)
 
-install(TARGETS ogg
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
+#install(TARGETS ogg
+#    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
+#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
+#)
+#install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+# proper installation for ogg (with config file)
+# from https://github.com/forexample/package-example
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(include_install_dir "include")
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(target_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+	"${version_config}" COMPATIBILITY SameMajorVersion
 )
-install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+configure_package_config_file(
+	"cmake/Config.cmake.in"
+	"${project_config}"
+	INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+	TARGETS ogg
+	EXPORT "${target_export_name}"
+	LIBRARY DESTINATION "lib"
+	ARCHIVE DESTINATION "lib"
+	FRAMEWORK DESTINATION "./"
+	RUNTIME DESTINATION "bin"
+	PUBLIC_HEADER DESTINATION "${include_install_dir}/ogg"
+)
+install(
+	FILES ogg.pc
+	DESTINATION "lib/pkgconfig"
+)
+
+install(
+	FILES "${project_config}" "${version_config}"
+	DESTINATION "${config_install_dir}"
+)
+
+install(
+	EXPORT "${target_export_name}"
+	NAMESPACE "${namespace}"
+	DESTINATION "${config_install_dir}"
+)
+
