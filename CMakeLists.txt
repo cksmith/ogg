@@ -115,8 +115,8 @@ configure_pkg_config_file(ogg.pc.in)
 
 # proper installation for ogg (with config file)
 # from https://github.com/forexample/package-example
-set(config_install_dir "lib/cmake/${PROJECT_NAME}")
-set(include_install_dir "include")
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(include_install_dir "${CMAKE_INSTALL_INCLUDEDIR}")
 set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
 set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
@@ -138,10 +138,10 @@ configure_package_config_file(
 install(
 	TARGETS ogg
 	EXPORT "${target_export_name}"
-	LIBRARY DESTINATION "lib"
-	ARCHIVE DESTINATION "lib"
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	FRAMEWORK DESTINATION "./"
-	RUNTIME DESTINATION "bin"
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	PUBLIC_HEADER DESTINATION "${include_install_dir}/ogg"
 )
 install(
